@@ -1,0 +1,147 @@
+## ---- eval=FALSE, message=FALSE, error=FALSE-----------------------------
+## getSymbols("GOOG")
+## GOOG
+
+
+## ---- eval=FALSE, message=FALSE, error=FALSE, fig.height= 5.0------------
+## require(quantmod)
+## getSymbols("GOOG")
+## chartSeries(GOOG)
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+require(quantmod)
+getSymbols("GOOG")
+chartSeries(GOOG)
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## chartSeries(GOOG, subset = 'last 1 years')
+## chartSeries(GOOG, subset = '2019')
+## chartSeries(GOOG, subset = '2008-06::2009-12')
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## getSymbols("AAPL")
+## chartSeries(AAPL, subset = 'last 1 years', TA = c(addSMA(20)))
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+chartSeries(GOOG, subset = 'last 1 years', TA = c(addSMA(20)))
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## ?TA
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## Ra <- c("AAPL") %>%
+##     tq_get(get  = "stock.prices",
+##            from = "2010-01-01",
+##            to   = "2019-06-30") %>%
+##     group_by(symbol) %>%
+##     tq_transmute(select     = adjusted,
+##                  mutate_fun = periodReturn,
+##                  period     = "yearly",
+##                  col_rename = "Ra")
+## 
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+library(tidyquant)
+Ra <- c("AAPL", "GOOG") %>%
+    tq_get(get  = "stock.prices",
+           from = "2010-01-01",
+           to   = "2019-06-30") %>%
+    group_by(symbol) %>%
+    tq_transmute(select     = adjusted, 
+                 mutate_fun = periodReturn, 
+                 period     = "yearly", 
+                 col_rename = "Ra")
+Ra
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## stock_prices <- c("AAPL", "GOOG", "NFLX") %>%
+##     tq_get(get  = "stock.prices",
+##            from = "2010-01-01",
+##            to   = "2019-06-01")
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+stock_prices <- c("AAPL", "GOOG", "NFLX") %>%
+    tq_get(get  = "stock.prices",
+           from = "2010-01-01",
+           to   = "2019-06-01")
+head(stock_prices)
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## stock_returns_yearly <- stock_prices %>%
+##     group_by(symbol) %>%
+##     tq_transmute(select     = adjusted,
+##                  mutate_fun = periodReturn,
+##                  period     = "yearly",
+##                  col_rename = "Ra")
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+stock_returns_yearly <- stock_prices %>%
+    group_by(symbol) %>%
+    tq_transmute(select     = adjusted, 
+                 mutate_fun = periodReturn, 
+                 period     = "yearly", 
+                 col_rename = "Ra")
+stock_returns_yearly
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## wts <- c(0.33, 0.33, 0.33)
+## portfolio_returns_yearly <- stock_returns_yearly %>%
+##     tq_portfolio(assets_col  = symbol,
+##                  returns_col = Ra,
+##                  weights     = wts,
+##                  col_rename  = "Ra")
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+wts <- c(0.33, 0.33, 0.34)
+portfolio_returns_yearly <- stock_returns_yearly %>%
+    tq_portfolio(assets_col  = symbol, 
+                 returns_col = Ra, 
+                 weights     = wts, 
+                 col_rename  = "Ra")
+portfolio_returns_yearly
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE, fig.height = 6.5----
+## portfolio_returns_yearly %>%
+##     ggplot(aes(x = date, y = Ra)) +
+##     geom_bar(stat = "identity", fill = palette_light()[[1]]) +
+##     labs(title = "Portfolio Returns",
+##          subtitle = "33% AAPL, 33% GOOG, and 34% NFLX",
+##          caption = "Shows an above-zero trend meaning positive returns",
+##          x = "", y = "Yearly Returns") +
+##     geom_smooth(method = "lm") +
+##     theme_tq() +
+##     scale_color_tq() +
+##     scale_y_continuous(labels = scales::percent)
+
+
+## ---- eval=TRUE, echo=FALSE, message = FALSE, error = FALSE, fig.height = 6.5----
+portfolio_returns_yearly %>%
+    ggplot(aes(x = date, y = Ra)) +
+    geom_bar(stat = "identity", fill = palette_light()[[1]]) +
+    labs(title = "Portfolio Returns",
+         subtitle = "33% AAPL, 33% GOOG, and 34% NFLX",
+         caption = "Shows an above-zero trend meaning positive returns",
+         x = "", y = "Yearly Returns") +
+    geom_smooth(method = "lm") +
+    theme_tq() +
+    scale_color_tq() +
+    scale_y_continuous(labels = scales::percent)
+
+
+## ---- eval=FALSE, echo=TRUE, message = FALSE, error = FALSE--------------
+## ?TTR
+
